@@ -1,6 +1,6 @@
 ---
-name: agent-north-star
-description: agent 产品的北极星指标——定「什么算成了」。核心判据：outcome 的形状由「翻了哪一格」决定，翻了判断权之后 DAU/时长/会话数这类投入侧指标全部作废，必须换成产出份额，且份额必须配误否率。委托在场型岗位则改用覆盖率与转化率。当用户要给 agent 产品定指标、问某个数字能不能用、报成绩单、或发现「数据很好看但说明不了问题」时使用。先用 agent-positioning 判定它翻了哪一格。
+name: north-star-metrics
+description: agent 产品的北极星指标——定「什么算成了」。核心判据：outcome 的形状由「翻了哪一格」决定，翻了判断权之后 DAU/时长/会话数这类投入侧指标全部作废，必须换成产出份额，且份额必须配误否率。委托在场型岗位则改用覆盖率与转化率。当用户要给 agent 产品定指标、问某个数字能不能用、报成绩单、或发现「数据很好看但说明不了问题」时使用。先用 agent-positioning 判定它翻了哪一格。这是 agent 产品版，通用版见 lenny-skills 的 north-star-metrics。
 ---
 
 # Agent 北极星指标
@@ -9,6 +9,8 @@ description: agent 产品的北极星指标——定「什么算成了」。核�
 
 先用 [agent-positioning](../agent-positioning/SKILL.md) 定位它翻了哪几格，
 再回来查下表。
+
+这是 agent 产品版。通用的北极星指标方法见 lenny-skills 的 `north-star-metrics`。
 
 ## 翻哪一格 → 指标换什么形状
 

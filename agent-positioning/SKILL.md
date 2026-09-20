@@ -1,12 +1,16 @@
 ---
 name: agent-positioning
-description: agent 产品定位分析——判定一个 agent 产品是「岗位」还是「能力包」，用三格尺（落点 / 在场 / 委托权）拆开它，在判断/在场/分诊三个维度上各定一档，并对照四个已上线产品。当用户要拆解某个 agent 产品、判断自家 agent 为什么没人依赖、决定新产品做多深、或问「这算不算一个新产品」时使用。设计具体岗位走 agent-job-design，定指标走 agent-north-star。
+description: agent 产品定位分析——判定一个 agent 产品是「岗位」还是「能力包」，用三格尺（落点 / 在场 / 委托权）拆开它，在判断/在场/分诊三个维度上各定一档，并对照四个已上线产品。当用户要拆解某个 agent 产品、判断自家 agent 为什么没人依赖、决定新产品做多深、或问「这算不算一个新产品」时使用。定指标走 north-star-metrics，判断能不能放权走 ai-evals。先用 positioning（lenny-skills 的通用版）做市场定位；产品是 agent 时，再用本 skill 判定它的产品形态。
 ---
 
 # Agent 定位分析
 
 **通用委托不存在——委托只能针对具体岗位。** 一个能力很强却没有岗位的 agent 是能力包：
 你说什么它做什么，你不说它就停。
+
+这一步接在市场定位之后。lenny-skills 的 `positioning` 回答“在市场里跟谁比、凭什么赢、卖给谁”，
+对所有产品都适用；本 skill 回答另一个问题：**这个 agent 在产品形态上是岗位还是能力包**，只适用于 agent 产品。
+两步都要做，先做通用的。
 
 四个已上线产品的对照见 [CASES.md](CASES.md)（Claude Code / Cowork / Claude Tag / Grok Bot，
 两个独立来源）。

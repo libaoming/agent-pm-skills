@@ -4,7 +4,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEST="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
 mkdir -p "$DEST"
-for d in "$REPO"/agent-*/; do
+for d in "$REPO"/*/; do
   name="$(basename "$d")"
   [ -f "$d/SKILL.md" ] || continue
   ln -sfn "$d" "$DEST/$name"

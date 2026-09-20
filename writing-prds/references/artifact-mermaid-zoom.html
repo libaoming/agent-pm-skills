@@ -1,0 +1,101 @@
+<!-- deep-prd artifact 公共片段:mermaid/SVG 点击放大(lightbox + 缩放)。
+     用法:CSS 段并入页面 <style> 末尾;<script> 段放页面最末。
+     依赖:暖纸 token(--bg/--surface/--ink/--muted/--line/--accent/--code-bg)。
+     ⚠️ 关键教训(2026-07-17 二次修复):不要把提示/点击绑在 <pre class="mermaid"> 上——
+     artifact 渲染器渲染后容器元素可能被替换,pre.mermaid::after 与 closest('pre.mermaid')
+     全部落空。正确做法=直接对渲染产物 <svg> 做事件委托,提示角标用 MutationObserver
+     在渲染完成后动态挂到 svg 父容器上。 -->
+
+<!-- ===== CSS(并入 <style>)===== -->
+<style>
+pre.mermaid{cursor:zoom-in; position:relative}
+.mz-hint{position:absolute; right:.6rem; top:.5rem; font-size:.72rem; color:var(--muted); background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:.05rem .5rem; pointer-events:none; z-index:5}
+#mzoom{display:none; position:fixed; inset:0; z-index:1000; background:rgba(30,25,15,.72); flex-direction:column}
+.mz-bar{display:flex; gap:.5rem; align-items:center; justify-content:center; padding:.55rem; background:var(--surface); border-bottom:1px solid var(--line)}
+.mz-bar button{font:inherit; font-size:.88rem; background:var(--code-bg); color:var(--ink); border:1px solid var(--line); border-radius:5px; padding:.15rem .8rem; cursor:pointer}
+.mz-bar button:hover,.mz-bar button:focus-visible{border-color:var(--accent); color:var(--accent)}
+.mz-pct{font-size:.85rem; color:var(--muted); min-width:3.5em; text-align:center; font-variant-numeric:tabular-nums}
+.mz-body{flex:1; overflow:auto; padding:1rem; background:var(--bg)}
+.mz-body svg{display:block; margin:0 auto}
+</style>
+
+<!-- ===== JS(放页面最末)===== -->
+<script>
+(function(){
+  var zoom = 1, baseW = 800;
+  function ensureOverlay(){
+    var ov = document.getElementById('mzoom');
+    if(ov) return ov;
+    ov = document.createElement('div');
+    ov.id = 'mzoom';
+    ov.innerHTML = '<div class="mz-bar"><button data-z="-" aria-label="缩小">−</button><span class="mz-pct">100%</span><button data-z="+" aria-label="放大">＋</button><button data-z="0">适应宽度</button><button class="mz-x">✕ 关闭</button></div><div class="mz-body"></div>';
+    document.body.appendChild(ov);
+    ov.querySelector('.mz-x').addEventListener('click', close);
+    ov.addEventListener('click', function(e){ if(e.target.classList.contains('mz-body')) close(); });
+    ov.querySelectorAll('button[data-z]').forEach(function(b){
+      b.addEventListener('click', function(){ setZoom(b.getAttribute('data-z')); });
+    });
+    ov.querySelector('.mz-body').addEventListener('wheel', function(e){
+      e.preventDefault(); setZoom(e.deltaY < 0 ? '+' : '-');
+    }, {passive:false});
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+    return ov;
+  }
+  function setZoom(op){
+    var ov = document.getElementById('mzoom');
+    var svg = ov && ov.querySelector('.mz-body svg');
+    if(!svg) return;
+    if(op === '+') zoom = Math.min(zoom + 0.25, 6);
+    else if(op === '-') zoom = Math.max(zoom - 0.25, 0.25);
+    else zoom = Math.max(0.25, (ov.querySelector('.mz-body').clientWidth - 32) / baseW);
+    svg.style.width = (baseW * zoom) + 'px';
+    ov.querySelector('.mz-pct').textContent = Math.round(zoom * 100) + '%';
+  }
+  function close(){
+    var ov = document.getElementById('mzoom');
+    if(!ov) return;
+    ov.style.display = 'none';
+    ov.querySelector('.mz-body').innerHTML = '';
+    document.body.style.overflow = '';
+  }
+  function open(svg){
+    if(!svg) return;
+    var ov = ensureOverlay(), body = ov.querySelector('.mz-body');
+    body.innerHTML = '';
+    var clone = svg.cloneNode(true);
+    clone.style.maxWidth = 'none';
+    clone.style.height = 'auto';
+    try { baseW = (svg.viewBox && svg.viewBox.baseVal.width) || svg.getBBox().width || 800; }
+    catch(err){ baseW = svg.clientWidth || 800; }
+    body.appendChild(clone);
+    ov.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    zoom = Math.max(1, (body.clientWidth - 32) / baseW);
+    clone.style.width = (baseW * zoom) + 'px';
+    ov.querySelector('.mz-pct').textContent = Math.round(zoom * 100) + '%';
+  }
+  // 点击委托:直接对 svg,不依赖 pre.mermaid 存活
+  document.addEventListener('click', function(e){
+    if(e.target.closest && e.target.closest('#mzoom')) return;
+    var svg = e.target.closest && e.target.closest('svg');
+    if(svg) open(svg);
+  });
+  // 渲染完成后给 svg 父容器挂「点击放大」角标(MutationObserver 等异步渲染)
+  function decorate(){
+    document.querySelectorAll('svg').forEach(function(svg){
+      if(svg.closest('#mzoom')) return;
+      var host = svg.parentElement;
+      if(!host || host.getAttribute('data-mz')) return;
+      host.setAttribute('data-mz', '1');
+      if(getComputedStyle(host).position === 'static') host.style.position = 'relative';
+      host.style.cursor = 'zoom-in';
+      var b = document.createElement('div');
+      b.className = 'mz-hint';
+      b.textContent = '🔍 点击放大';
+      host.appendChild(b);
+    });
+  }
+  new MutationObserver(decorate).observe(document.body, {childList:true, subtree:true});
+  decorate();
+})();
+</script>
